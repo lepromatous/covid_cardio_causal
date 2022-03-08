@@ -2,6 +2,14 @@
 .Rhistory
 .Rapp.history
 
+*.csv
+*.xlsx
+*.feather
+*.fst
+*.DS_Store
+*.pdf
+
+
 # Session Data files
 .RData
 
