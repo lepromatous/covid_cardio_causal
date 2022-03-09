@@ -71,18 +71,21 @@ summary(out2)
 
 # Make covariates set ----
 df$gender <- ifelse(df$gender=="M",1,0)
-X = df[,c(8, 10:17, 20:31, 43:81, 85, 89:109)]
+X = names(df[,c(8, 10:17, 20:31, 43:81, 85, 89:109)])
 
-df2 <- df[complete.cases(df[,c(names(X), "any.cardio", "icu", "prop.poverty")]), c(names(X), "any.cardio", "icu", "prop.poverty")]
-X2 <- df2[,names(X)]
+df2 <- df[complete.cases(df[,c(X, "any.cardio", "icu", "prop.poverty")]), c(X, "any.cardio", "prop.poverty")]
+df2$id <- seq(1:nrow(df2))
+train <- df2 %>% dplyr::sample_frac(.50)
+test  <- dplyr::anti_join(df2, train, by = 'id')
+
 # ==========================================================================#
 # Causal Forest
 # ==========================================================================#
 set.seed(123467)
 model <- instrumental_forest(
-  Y=df2$any.cardio,
-  X=X2,
-  W=df2$icu,
-  Z=df2$prop.poverty,
-  num.trees = 50000
+  Y=train$any.cardio,
+  X=train[,X],
+  W=train$icu,
+  Z=train$prop.poverty,
+  num.trees = 30000
 )
